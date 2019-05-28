@@ -49,7 +49,7 @@ public class RequestHandler {
 
 
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 85, bos);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
             byte[] bitmapData = bos.toByteArray();
 
             os.write(bitmapData);

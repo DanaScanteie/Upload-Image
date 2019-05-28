@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     ArrayAdapter<String> adapter;
     List<String> list;
     HashMap<String,String> urls;
+    private Boolean resize = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(adapter);
             spinner.setOnItemSelectedListener(this);
+            resize = getIntent().getExtras().getBoolean("EXTRA_RESIZE");
         }
 
         chooseButton.setOnClickListener(new View.OnClickListener() {
@@ -141,6 +143,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             case R.id.action_remove_url:
             {
                 Intent newIntent = new Intent(MainActivity.this, RemoveActivity.class);
+                startActivity(newIntent);
+
+                return true;
+            }
+            case R.id.action_settings:
+            {
+                Intent newIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                newIntent.putExtra("CHECKBOX_STATE", resize);
                 startActivity(newIntent);
 
                 return true;
@@ -235,30 +245,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-    private void resizeImage(Bitmap bitmapVar) {
-        int deviceWidth = getWindowManager().getDefaultDisplay().getWidth();
-        int deviceHeight = getWindowManager().getDefaultDisplay().getHeight();
-        int bitmapHeight = bitmapVar.getHeight();
-        int bitmapWidth = bitmapVar.getWidth();
+    public static Bitmap resizeImage(Bitmap realImage, float maxImageSize, boolean filter) {
+        float ratio = Math.min((float) maxImageSize / realImage.getWidth(), (float) maxImageSize / realImage.getHeight());
+        int width = Math.round((float) ratio * realImage.getWidth());
+        int height = Math.round((float) ratio * realImage.getHeight());
 
-        if (bitmapWidth > deviceWidth) {
-            int scaledWidth = deviceWidth;
-            int scaledHeight = (scaledWidth * bitmapHeight) / bitmapWidth;
-            if (scaledHeight > deviceHeight)
-                scaledHeight = deviceHeight;
-            Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmapVar, scaledWidth, scaledHeight, true);
-            bitmap = bitmapScaled;
-        }
-        else if (bitmapHeight > deviceHeight) {
-            int scaledHeight = deviceHeight;
-            int scaledWidth = (scaledHeight * bitmapWidth) / bitmapHeight;
-            if (scaledWidth > deviceWidth)
-                scaledWidth = deviceWidth;
-            Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmapVar, scaledWidth, scaledHeight, true);
-            bitmap = bitmapScaled;
-        }
-
-        imageView.setImageBitmap(bitmap);
+        Bitmap bitmapScaled = Bitmap.createScaledBitmap(realImage, width, height, filter);
+        return bitmapScaled;
     }
 
     private String getFileName(Uri uri){
@@ -307,6 +300,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         UploadImage ui = new UploadImage();
+        if(resize==true)
+            bitmap = resizeImage(bitmap, 2 * 1024, true);
         ui.execute(bitmap);
     }
 }
