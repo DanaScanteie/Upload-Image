@@ -28,8 +28,8 @@ public class RemoveActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_remove);
 
-        editTextName = (EditText) findViewById(R.id.editTextName);
-        removeButton = (Button) findViewById(R.id.removeButton);
+        editTextName = findViewById(R.id.editTextName);
+        removeButton = findViewById(R.id.removeButton);
 
         removeButton.setOnClickListener(new View.OnClickListener() {
             @Override

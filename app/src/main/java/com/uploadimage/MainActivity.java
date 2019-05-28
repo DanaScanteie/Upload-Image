@@ -34,6 +34,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private static final String FILE_NAME = "uploadFile.txt";
+    private static final int PICK_IMAGE = 100;
 
     private ImageView imageView;
     private Button chooseButton;
@@ -41,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Button uploadButton;
 
     private String UPLOAD_URL = "http://vega.unitbv.ro/~carpm/tst/index.php";
-    private static final int PICK_IMAGE = 100;
     private int ANGLE = 0;
     private Uri imageUri;
     private Bitmap bitmap;
@@ -57,10 +57,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        imageView = (ImageView) findViewById(R.id.imageView);
-        chooseButton = (Button) findViewById(R.id.chooseButton);
-        rotateButton = (Button) findViewById(R.id.rotateButton);
-        uploadButton = (Button) findViewById(R.id.uploadButton);
+        imageView = findViewById(R.id.imageView);
+        chooseButton = findViewById(R.id.chooseButton);
+        rotateButton = findViewById(R.id.rotateButton);
+        uploadButton = findViewById(R.id.uploadButton);
 
         Spinner spinner = findViewById(R.id.spinner1);
 
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         urls = new HashMap<>();
         loadFile();
 
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, list);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, list);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
@@ -205,7 +205,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (imageUri != null ) {
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                resizeImage(bitmap);
+                //resizeImage(bitmap);
+                imageView.setImageBitmap(bitmap);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -227,7 +228,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
                     //resizeImage(bitmap);
                     imageView.setImageBitmap(bitmap);
-
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -261,13 +261,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         imageView.setImageBitmap(bitmap);
     }
 
-
-    public String getStringImage(Bitmap bmp){
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] imageBytes = baos.toByteArray();
-        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
-        return encodedImage;
+    private String getFileName(Uri uri){
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        if (result == null) {
+            result = uri.getLastPathSegment();
+        }
+        return result;
     }
 
     private void uploadImage(){
@@ -285,42 +294,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
                 dialog.dismiss();
-                Toast.makeText(getApplicationContext(),"Image Uploaded",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
             }
 
             @Override
             protected String doInBackground(Bitmap... params) {
                 Bitmap bitmap = params[0];
-                String uploadImage = getStringImage(bitmap);
-
-                HashMap<String,String> data = new HashMap<>();
-                data.put("thumb_file", uploadImage);
-                data.put("up_file", getFileName(imageUri));
-
-                String result = requestHandler.postRequest(UPLOAD_URL, data);
+                String filename = getFileName(imageUri);
+                String result = requestHandler.postRequest(UPLOAD_URL, bitmap, filename);
                 return result;
             }
         }
 
         UploadImage ui = new UploadImage();
         ui.execute(bitmap);
-    }
-
-    String getFileName(Uri uri){
-        String result = null;
-        if (uri.getScheme().equals("content")) {
-            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-            try {
-                if (cursor != null && cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                }
-            } finally {
-                cursor.close();
-            }
-        }
-        if (result == null) {
-            result = uri.getLastPathSegment();
-        }
-        return result;
     }
 }

@@ -27,9 +27,9 @@ public class AddActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
 
-        editTextName = (EditText) findViewById(R.id.editTextName);
-        editTextURL = (EditText) findViewById(R.id.editTextURL);
-        addButton = (Button) findViewById(R.id.addButton);
+        editTextName = findViewById(R.id.editTextName);
+        editTextURL = findViewById(R.id.editTextURL);
+        addButton = findViewById(R.id.addButton);
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,7 +50,7 @@ public class AddActivity extends AppCompatActivity {
 
                     editTextName.getText().clear();
                     editTextURL.getText().clear();
-                    Toast.makeText(getApplicationContext(), "Saved to file.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Saved file " + FILE_NAME, Toast.LENGTH_LONG).show();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {

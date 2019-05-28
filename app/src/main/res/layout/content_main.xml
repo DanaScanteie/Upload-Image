@@ -11,13 +11,14 @@
 
     <Spinner
         android:id="@+id/spinner1"
-        android:layout_width="204dp"
-        android:layout_height="37dp"
+        android:layout_width="221dp"
+        android:layout_height="45dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="9dp"
         android:layout_marginEnd="8dp"
-        android:background="?attr/colorPrimary"
-        android:popupBackground="#5fd5d7"
+        android:background="@drawable/shape_button"
+        android:popupBackground="#15948A"
+        android:textColor="#FFFFFF"
         app:layout_constraintEnd_toStartOf="@+id/rotateButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -48,34 +49,36 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="387dp"
-        android:layout_height="479dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="70dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="100dp"
         android:src="@android:drawable/screen_background_light"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinner1"
-        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintTop_toBottomOf="@+id/rotateButton"
+        app:layout_constraintVertical_bias="0.049"
         tools:src="@android:drawable/screen_background_dark" />
 
     <Button
         android:id="@+id/uploadButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="157dp"
+        android:layout_height="49dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="36dp"
         android:layout_marginBottom="8dp"
+        android:background="@drawable/shape_button"
         android:text="Upload"
+        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.584"
+        app:layout_constraintHorizontal_bias="0.566"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView"
-        app:layout_constraintVertical_bias="0.19" />
+        app:layout_constraintVertical_bias="0.371" />
 </android.support.constraint.ConstraintLayout>
