@@ -3,6 +3,7 @@ package com.uploadimage;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -11,7 +12,7 @@ import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,18 +23,12 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-    private static final String FILE_NAME = "uploadFile.txt";
     private static final int PICK_IMAGE = 100;
 
     private ImageView imageView;
@@ -67,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         list = new ArrayList<>();
         urls = new HashMap<>();
-        loadFile();
+        getData();
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, list);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -85,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         if (getIntent().getExtras() != null) {
-            loadFile();
+            getData();
             adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, list);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(adapter);
@@ -119,6 +114,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
         });
+
+        initializeDataBase();
     }
 
     @Override
@@ -155,6 +152,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 return true;
             }
+
+            case R.id.action_results:
+            {
+                Intent newIntent = new Intent(MainActivity.this, EditActivity.class);
+                startActivity(newIntent);
+                return true;
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -172,40 +176,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-    public void loadFile() {
-        FileInputStream fis = null;
+    public void getData() {
+        list.clear();
+        urls.clear();
+        SQLiteDatabase _dataDB;
+        _dataDB = openOrCreateDatabase("UploadImageDatabase", MODE_PRIVATE, null);
 
-        try {
-            fis = openFileInput(FILE_NAME);
-            InputStreamReader isr = new InputStreamReader(fis);
-            BufferedReader br = new BufferedReader(isr);
-            StringBuilder sb = new StringBuilder();
-            String text;
+        Cursor cursor = _dataDB.rawQuery("SELECT * FROM Url", null);
 
-            list.clear();
-            urls.clear();
-            while ((text = br.readLine()) != null) {
-                String[] str = text.split(" ");
-                list.add(str[0]);
-                urls.put(str[0], str[str.length-1]);
-                sb.append(text).append("\n");
-            }
+        if (cursor.moveToFirst()) {
+            do {
+                String strName = cursor.getString(cursor.getColumnIndex("Name"));
+                String strPassword = cursor.getString(cursor.getColumnIndex("UrlLink"));
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+                list.add(strName);
+                urls.put(strName, strPassword);
+            } while (cursor.moveToNext());
+
         }
+        cursor.close();
     }
-
 
 
 
@@ -227,7 +217,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         startActivityForResult(gallery, PICK_IMAGE);
     }
-
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -300,8 +289,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         UploadImage ui = new UploadImage();
+        Log.i("myapp", "Without resize:" + String.valueOf(bitmap.getAllocationByteCount()));
         if(resize==true)
-            bitmap = resizeImage(bitmap, 2 * 1024, true);
+        {    bitmap = resizeImage(bitmap, 1024, true);
+            Log.i("myapp", "With resize" + String.valueOf(bitmap.getAllocationByteCount()));
+        }
         ui.execute(bitmap);
+    }
+
+    public void initializeDataBase() {
+        SQLiteDatabase dataDB = openOrCreateDatabase("UploadImageDatabase", MODE_PRIVATE, null);
+
+        dataDB.execSQL("CREATE TABLE IF NOT EXISTS Url(Name Text(20) PRIMARY KEY ," + " UrlLink Text(50));");
+        dataDB.close();
     }
 }

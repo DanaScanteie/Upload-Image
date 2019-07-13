@@ -1,6 +1,5 @@
 package com.uploadimage;
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;

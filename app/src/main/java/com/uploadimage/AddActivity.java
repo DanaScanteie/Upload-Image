@@ -1,6 +1,8 @@
 package com.uploadimage;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -8,13 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 
 public class AddActivity extends AppCompatActivity {
-    private static final String FILE_NAME = "uploadFile.txt";
     String inputName;
     String inputURL;
 
@@ -39,34 +36,45 @@ public class AddActivity extends AppCompatActivity {
 
                 inputName = editTextName.getText().toString();
                 inputURL = editTextURL.getText().toString();
-                FileOutputStream fos = null;
 
-                try {
-                    fos = openFileOutput(FILE_NAME, MODE_APPEND);
-                    fos.write(inputName.getBytes());
-                    fos.write(" ".getBytes());
-                    fos.write(inputURL.getBytes());
-                    fos.write("\n".getBytes());
-
-                    editTextName.getText().clear();
-                    editTextURL.getText().clear();
-                    Toast.makeText(getApplicationContext(), "Saved file " + FILE_NAME, Toast.LENGTH_LONG).show();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (fos != null) {
-                        try {
-                            fos.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-
+                addToDatabase();
                 startActivity(intent);
             }
         });
+
+
+    }
+
+    public void addToDatabase() {
+        try {
+            SQLiteDatabase _dataDB;
+            _dataDB = openOrCreateDatabase("UploadImageDatabase", MODE_PRIVATE, null);
+            SQLiteStatement s = _dataDB.compileStatement("SELECT count(*) FROM Url " +
+                    "WHERE Name='" + inputName + "' AND UrlLink = '" + inputURL + "';");
+
+            long count = s.simpleQueryForLong();
+            _dataDB.close();
+
+            if (count >= 1) {
+                Toast.makeText(getApplicationContext(), "This url already exist." , Toast.LENGTH_LONG).show();
+            }
+            else {
+                try{
+                    _dataDB = openOrCreateDatabase("UploadImageDatabase", MODE_PRIVATE, null);
+                    String sql = "INSERT INTO Url " +
+                            "VALUES('" + inputName + "', '" + inputURL  + "');";
+                    SQLiteStatement st = _dataDB.compileStatement(sql);
+                    st.executeInsert();
+                    _dataDB.close();
+
+                    Toast.makeText(getApplicationContext(), "New url added with success!", Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+        } catch (Exception e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 }
