@@ -13,9 +13,19 @@
         android:title="Remove URL"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_results"
+        android:id="@+id/action_edit_url"
         android:orderInCategory="100"
         android:title="Edit URL"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_edit_key"
+        android:orderInCategory="100"
+        android:title="Edit Key"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_crop_image"
+        android:orderInCategory="100"
+        android:title="Crop Image"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_settings"

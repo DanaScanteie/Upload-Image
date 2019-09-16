@@ -12,8 +12,8 @@ import android.widget.Toast;
 
 
 public class AddActivity extends AppCompatActivity {
-    String inputName;
-    String inputURL;
+    private String inputName;
+    private String inputURL;
 
     private EditText editTextName;
     private EditText editTextURL;
@@ -41,31 +41,27 @@ public class AddActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-
     }
 
     public void addToDatabase() {
         try {
-            SQLiteDatabase _dataDB;
-            _dataDB = openOrCreateDatabase("UploadImageDatabase", MODE_PRIVATE, null);
-            SQLiteStatement s = _dataDB.compileStatement("SELECT count(*) FROM Url " +
+            SQLiteDatabase dataDB = openOrCreateDatabase("UploadImageDatabase", MODE_PRIVATE, null);
+            SQLiteStatement s = dataDB.compileStatement("SELECT count(*) FROM Url " +
                     "WHERE Name='" + inputName + "' AND UrlLink = '" + inputURL + "';");
 
             long count = s.simpleQueryForLong();
-            _dataDB.close();
+            dataDB.close();
 
             if (count >= 1) {
                 Toast.makeText(getApplicationContext(), "This url already exist." , Toast.LENGTH_LONG).show();
             }
             else {
                 try{
-                    _dataDB = openOrCreateDatabase("UploadImageDatabase", MODE_PRIVATE, null);
-                    String sql = "INSERT INTO Url " +
-                            "VALUES('" + inputName + "', '" + inputURL  + "');";
-                    SQLiteStatement st = _dataDB.compileStatement(sql);
+                    dataDB = openOrCreateDatabase("UploadImageDatabase", MODE_PRIVATE, null);
+                    String sql = "INSERT INTO Url " + "VALUES('" + inputName + "', '" + inputURL  + "');";
+                    SQLiteStatement st = dataDB.compileStatement(sql);
                     st.executeInsert();
-                    _dataDB.close();
+                    dataDB.close();
 
                     Toast.makeText(getApplicationContext(), "New url added with success!", Toast.LENGTH_LONG).show();
                 } catch (Exception e) {

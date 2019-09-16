@@ -45,8 +45,8 @@ public class ListAdapter extends ArrayAdapter<URLDetails> {
             LayoutInflater inflater = LayoutInflater.from(mContext);
             convertView = inflater.inflate(mResource, parent, false);
             holder= new ViewHolder();
-            holder.name = (TextView) convertView.findViewById(R.id.textView1);
-            holder.url = (TextView) convertView.findViewById(R.id.textView2);
+            holder.name =  convertView.findViewById(R.id.textView1);
+            holder.url =  convertView.findViewById(R.id.textView2);
 
             result = convertView;
 

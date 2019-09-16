@@ -26,58 +26,16 @@ public class RemoveActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(RemoveActivity.this, MainActivity.class);
                 intent.putExtra("EXTRA", editTextName.getText().toString());
-                Boolean removed = false;
 
                 try{
-                    SQLiteDatabase _dataDB;
-                    _dataDB = openOrCreateDatabase("UploadImageDatabase", MODE_PRIVATE, null);
-
+                    SQLiteDatabase dataDB = openOrCreateDatabase("UploadImageDatabase", MODE_PRIVATE, null);
                     String sql = "DELETE FROM Url WHERE Name ='" +  editTextName.getText().toString() + "';";
-                    _dataDB.execSQL(sql);
-                    _dataDB.close();
+                    dataDB.execSQL(sql);
+                    dataDB.close();
 
                 } catch (Exception e) {
 
                 }
-
-//                try {
-//                    FileInputStream fis = openFileInput(FILE_NAME);
-//                    InputStreamReader isr = new InputStreamReader(fis);
-//                    BufferedReader br = new BufferedReader(isr);
-//                    List<String> lines = new LinkedList<>();
-//                    String line;
-//
-//                    while ((line = br.readLine()) != null) {
-//                        if(!line.contains(editTextName.getText().toString())) {
-//                            lines.add(line);
-//                        }
-//                        else {
-//                            Toast.makeText(getApplicationContext(), editTextName.getText().toString() + " has been removed.",
-//                                    Toast.LENGTH_LONG).show();
-//                            removed = true;
-//                        }
-//                    }
-//                    if(removed == false) {
-//                        Toast.makeText(getApplicationContext(), editTextName.getText().toString() + " doesn't exist",
-//                                Toast.LENGTH_LONG).show();
-//                    }
-//
-//                    br.close();
-//
-//                    deleteFile(FILE_NAME);
-//                    FileOutputStream  fos = openFileOutput(FILE_NAME, MODE_APPEND);
-//                    for (String l : lines) {
-//                        fos.write(l.getBytes());
-//                        fos.write("\n".getBytes());
-//                    }
-//                    fos.close();
-//
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-
                 startActivity(intent);
             }
         });

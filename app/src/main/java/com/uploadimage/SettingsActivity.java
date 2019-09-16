@@ -1,6 +1,7 @@
 package com.uploadimage;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -32,6 +33,11 @@ public class SettingsActivity extends AppCompatActivity {
                 Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
                 intent.putExtra("EXTRA_RESIZE", checkBox.isChecked());
                 startActivity(intent);
+
+                SharedPreferences prefs = getSharedPreferences("preferences", MODE_PRIVATE);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putBoolean("resize", checkBox.isChecked());
+                editor.apply();
             }
         });
     }

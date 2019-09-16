@@ -20,20 +20,19 @@ public class EditActivity extends AppCompatActivity {
     private EditText editTextUrl;
     private Button editButton;
 
-    ArrayList<URLDetails> urls;
-    ListAdapter adapter;
-    ListView listView;
-    URLDetails selectedUrl;
+    private ArrayList<URLDetails> urls;
+    private ListAdapter adapter;
+    private ListView listView;
+    private URLDetails selectedUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
 
-        editTextName = (EditText) findViewById(R.id.etFirstName);
-        editTextUrl = (EditText) findViewById(R.id.etLastName);
-
-        listView=(ListView)findViewById(R.id.listView);
+        editTextName = findViewById(R.id.etFirstName);
+        editTextUrl = findViewById(R.id.etLastName);
+        listView = findViewById(R.id.listView);
 
         urls = new ArrayList<>();
         getData();
@@ -61,14 +60,13 @@ public class EditActivity extends AppCompatActivity {
             public void onClick(View v) {
                 try{
                     Intent newIntent = new Intent(EditActivity.this, MainActivity.class);
-                    SQLiteDatabase _dataDB;
-                    _dataDB = openOrCreateDatabase("UploadImageDatabase", MODE_PRIVATE, null);
+                    SQLiteDatabase dataDB = openOrCreateDatabase("UploadImageDatabase", MODE_PRIVATE, null);
 
                     String sql = "UPDATE Url " + "SET Name ='" + editTextName.getText().toString() + "', UrlLink = '" +
                             editTextUrl.getText().toString() + "' WHERE Name ='" + selectedUrl.getName() + "' AND UrlLink ='" +
                             selectedUrl.getUrl() + "';";
-                    _dataDB.execSQL(sql);
-                    _dataDB.close();
+                    dataDB.execSQL(sql);
+                    dataDB.close();
                     startActivity(newIntent);
 
                 } catch (Exception e) {
@@ -76,23 +74,19 @@ public class EditActivity extends AppCompatActivity {
                 }
             }
         });
-
-
     }
 
     public void getData() {
-        SQLiteDatabase _dataDB;
-        _dataDB = openOrCreateDatabase("UploadImageDatabase", MODE_PRIVATE, null);
 
-        Cursor cursor = _dataDB.rawQuery("SELECT * FROM Url", null);
+        SQLiteDatabase dataDB = openOrCreateDatabase("UploadImageDatabase", MODE_PRIVATE, null);
+        Cursor cursor = dataDB.rawQuery("SELECT * FROM Url", null);
 
         if (cursor.moveToFirst()) {
             do {
                 String strName = cursor.getString(cursor.getColumnIndex("Name"));
-                String strPassword = cursor.getString(cursor.getColumnIndex("UrlLink"));
-                String strScore = cursor.getString(cursor.getColumnIndex("UrlLink"));
+                String strURL = cursor.getString(cursor.getColumnIndex("UrlLink"));
 
-                URLDetails url = new URLDetails(strName, strPassword);
+                URLDetails url = new URLDetails(strName, strURL);
                 urls.add(url);
             } while (cursor.moveToNext());
 
